@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тренажёр: Степени двойки</title>
+
+  <!-- KaTeX для формул -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background: #f0f4f8;
+      color: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 16px;
+    }
+    .main-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 860px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      padding: 32px;
+      position: relative;
+    }
+    .start-screen {
+      text-align: center;
+      padding: 10px 0;
+    }
+    .start-title {
+      font-size: 23px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 20px;
+    }
+    .rules-card {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 20px 24px;
+      text-align: left;
+      margin-bottom: 28px;
+    }
+    .rules-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 12px;
+    }
+    .rules-list {
+      list-style-type: decimal;
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .rules-list li {
+      font-size: 15px;
+      color: #334155;
+      line-height: 1.5;
+    }
+    .btn {
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-block;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+    .btn:hover {
+      background: #1d4ed8;
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .header-step {
+      display: flex;
+      justify-content: space-between;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #2563eb;
+      transition: width 0.3s ease;
+    }
+    .step-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .step-desc {
+      font-size: 15px;
+      color: #64748b;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .tasks-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .task-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-size: 16px;
+      color: #0f172a;
+      flex-wrap: wrap;
+    }
+    .math-op {
+      margin: 0 4px;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .num-input {
+      padding: 6px 10px;
+      border: 2px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+      background: #ffffff;
+      color: #0f172a;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+    .num-input:focus {
+      border-color: #2563eb;
+    }
+    .num-input.correct {
+      border-color: #22c55e !important;
+      background: #dcfce7 !important;
+      color: #15803d !important;
+    }
+    .num-input.wrong {
+      border-color: #ef4444 !important;
+      background: #fee2e2 !important;
+      color: #b91c1c !important;
+    }
+
+    /* Блок с фигурными скобками для группировки */
+    .brace-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .brace-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .brace-equation {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 14px;
+      font-size: 18px;
+      flex-wrap: wrap;
+    }
+    .brace-eq-left {
+      padding-top: 2px;
+    }
+    .brace-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .brace-top {
+      padding: 0 6px;
+      font-size: 18px;
+    }
+    .brace-svg {
+      width: 100%;
+      height: 16px;
+      display: block;
+      margin: 2px 0 4px 0;
+    }
+    .brace-dot {
+      padding-top: 2px;
+      font-weight: 700;
+      font-size: 20px;
+    }
+    .brace-result-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 17px;
+      padding-top: 10px;
+      border-top: 1px dashed #cbd5e1;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Сетка по столбцам для таблицы 1..12 */
+    .powers-columns-grid {
+      display: grid;
+      grid-template-rows: repeat(4, auto);
+      grid-auto-flow: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 680px) {
+      .powers-columns-grid {
+        grid-template-rows: repeat(6, auto);
+      }
+    }
+
+    /* Сетка для заданий вразнобой */
+    .powers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .powers-columns-grid .task-row,
+    .powers-grid .task-row {
+      padding: 10px 14px;
+      justify-content: space-between;
+    }
+
+    .feedback-note {
+      font-size: 13.5px;
+      color: #b91c1c;
+      font-weight: 600;
+      margin-left: 6px;
+      display: none;
+    }
+    .actions-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Итоговый экран */
+    .result-screen {
+      text-align: center;
+      display: none;
+      padding: 10px 0;
+    }
+    .result-screen h2 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+    .result-score {
+      font-size: 48px;
+      font-weight: 800;
+      color: #1e293b;
+      margin: 14px 0;
+    }
+    .result-msg {
+      font-size: 15px;
+      color: #475569;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .results-badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 16px 0 32px 0;
+    }
+    .badge-item {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .badge-item.correct {
+      background: #dcfce7;
+      color: #15803d;
+      border: 2px solid #22c55e;
+    }
+    .badge-item.partial {
+      background: #fef9c3;
+      color: #854d0e;
+      border: 2px solid #eab308;
+    }
+    .badge-item.wrong {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 2px solid #ef4444;
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-card">
+  <!-- СТАРТОВЫЙ ЭКРАН -->
+  <div class="start-screen" id="start-screen">
+    <h1 class="start-title">Тренажёр: Степени двойки</h1>
+    <div class="rules-card">
+      <div class="rules-title">Инструкция к прохождению:</div>
+      <ol class="rules-list">
+        <li><strong>Вписывай ответы в ячейки:</strong> вводи числа в поля со знаком вопроса.</li>
+        <li><strong>Начисление баллов:</strong> 1 балл даётся за задание без ошибок, 0.5 балла — если допущена 1 ошибка.</li>
+             </ol>
+    </div>
+    <button class="btn" onclick="startTrainer()">Начать задания</button>
+  </div>
+
+  <!-- ЭКРАН ЗАДАНИЙ -->
+  <div id="quiz-screen" style="display: none;">
+    <div class="header-step">
+      <span id="step-counter">Задание 1 из 9</span>
+      <span id="score-counter">Баллы: 0 / 9</span>
+    </div>
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progress"></div>
+    </div>
+
+    <div class="step-title" id="step-title"></div>
+    <div class="step-desc" id="step-desc"></div>
+
+    <div id="tasks-container"></div>
+
+    <div class="actions-footer">
+      <button class="btn" id="btn-check" onclick="checkCurrentStep()">Проверить</button>
+      <button class="btn" id="btn-next" style="display: none;" onclick="goToNextStep()">Следующее задание ➔</button>
+    </div>
+  </div>
+
+  <!-- РЕЗУЛЬТАТЫ -->
+  <div class="result-screen" id="result-screen">
+    <h2>Тестирование завершено</h2>
+    <div class="result-score" id="final-score">0 / 9</div>
+    <p class="result-msg" id="final-message"></p>
+
+    <div style="font-weight: 600; color: #334155; margin-bottom: 12px; font-size: 15px;">Результаты по заданиям:</div>
+    <div class="results-badges" id="results-badges"></div>
+
+    <button class="btn" onclick="restart()">Пройти повторно</button>
+  </div>
+</div>
+
+<script>
+const braceSvg = `
+  <svg class="brace-svg" viewBox="0 0 100 16" preserveAspectRatio="none">
+    <path d="M 2,1 Q 2,8 12,8 L 43,8 Q 50,8 50,15 Q 50,8 57,8 L 88,8 Q 98,8 98,1"
+          fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round"/>
+  </svg>
+`;
+
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+const stageBanks = [
+  // ЗАДАНИЕ 1
+  {
+    title: "Задание 1",
+    desc: "Степень показывает, сколько двоек нужно перемножить. Заполни пропуски:",
+    layout: "list",
+    variants: [
+      [
+        { parts: [{ text: "$2^1 =$" }, { input: "2", width: "65px" }], hint: "2" },
+        { parts: [{ text: "$2^2 =$" }, { input: "2", width: "50px" }, { op: "·" }, { input: "2", width: "50px" }, { text: "$=$" }, { input: "4", width: "65px" }], hint: "2 · 2 = 4" },
+        { parts: [{ text: "$2^3 =$" }, { input: "2", width: "45px" }, { op: "·" }, { input: "2", width: "45px" }, { op: "·" }, { input: "2", width: "45px" }, { text: "$=$" }, { input: "8", width: "65px" }], hint: "2 · 2 · 2 = 8" },
+        { parts: [{ text: "$2^4 =$" }, { input: "2", width: "45px" }, { op: "·" }, { input: "2", width: "45px" }, { op: "·" }, { input: "2", width: "45px" }, { op: "·" }, { input: "2", width: "45px" }, { text: "$=$" }, { input: "16", width: "65px" }], hint: "2 · 2 · 2 · 2 = 16" }
+      ]
+    ]
+  },
+
+  // ЗАДАНИЕ 2
+  {
+    title: "Задание 2",
+    desc: "Чтобы не умножать много двоек подряд, разобьём их на две равные группы. Впиши значения под фигурными скобками и посчитай итог:",
+    layout: "brace-list",
+    variants: [
+      [
+        {
+          leftExpr: "$2^6 =$",
+          group1Expr: "$2 \\cdot 2 \\cdot 2$",
+          group1Ans: "8",
+          group2Expr: "$2 \\cdot 2 \\cdot 2$",
+          group2Ans: "8",
+          finalParts: [{ text: "$2^6 =$" }, { input: "8", width: "60px" }, { op: "·" }, { input: "8", width: "60px" }, { text: "$=$" }, { input: "64", width: "75px" }],
+          hint: "8 · 8 = 64"
+        },
+        {
+          leftExpr: "$2^8 =$",
+          group1Expr: "$2 \\cdot 2 \\cdot 2 \\cdot 2$",
+          group1Ans: "16",
+          group2Expr: "$2 \\cdot 2 \\cdot 2 \\cdot 2$",
+          group2Ans: "16",
+          finalParts: [{ text: "$2^8 =$" }, { input: "16", width: "65px" }, { op: "·" }, { input: "16", width: "65px" }, { text: "$=$" }, { input: "256", width: "80px" }],
+          hint: "16 · 16 = 256"
+        }
+      ],
+      [
+        {
+          leftExpr: "$2^8 =$",
+          group1Expr: "$2 \\cdot 2 \\cdot 2 \\cdot 2$",
+          group1Ans: "16",
+          group2Expr: "$2 \\cdot 2 \\cdot 2 \\cdot 2$",
+          group2Ans: "16",
+          finalParts: [{ text: "$2^8 =$" }, { input: "16", width: "65px" }, { op: "·" }, { input: "16", width: "65px" }, { text: "$=$" }, { input: "256", width: "80px" }],
+          hint: "16 · 16 = 256"
+        },
+        {
+          leftExpr: "$2^6 =$",
+          group1Expr: "$2 \\cdot 2 \\cdot 2$",
+          group1Ans: "8",
+          group2Expr: "$2 \\cdot 2 \\cdot 2$",
+          group2Ans: "8",
+          finalParts: [{ text: "$2^6 =$" }, { input: "8", width: "60px" }, { op: "·" }, { input: "8", width: "60px" }, { text: "$=$" }, { input: "64", width: "75px" }],
+          hint: "8 · 8 = 64"
+        }
+      ]
+    ]
+  },
+
+  // ЗАДАНИЕ 3
+  {
+    title: "Задание 3",
+    desc: "Десять двоек делятся пополам на две пятёрки ($2^5 = 32$). Вычисли $2^{10}$:",
+    layout: "list",
+    variants: [
+      [
+        {
+          parts: [{ text: "$2^{10} = 2^5 \\cdot 2^5 =$" }, { input: "32", width: "65px" }, { op: "·" }, { input: "32", width: "65px" }, { text: "$=$" }, { input: "1024", width: "85px" }],
+          hint: "32 · 32 = 1024"
+        }
+      ]
+    ]
+  },
+
+  // ЗАДАНИЕ 4
+  {
+    title: "Задание 4",
+    desc: "Пять двоек — это четыре двойки ($2^4 = 16$) и ещё одна двойка. Поэтому достаточно просто умножить предыдущее значение на 2:",
+    layout: "step-forward-brace",
+    variants: [
+      {
+        braceHeader: { leftExpr: "$2^5 =$", groupExpr: "$2 \\cdot 2 \\cdot 2 \\cdot 2$", underLabel: "$2^4 = 16$", rightExpr: "· 2" },
+        tasks: [
+          { parts: [{ text: "Знаем $2^4 = 16$. Тогда $2^5 =$" }, { input: "16", width: "65px" }, { op: "· 2 =" }, { input: "32", width: "70px" }], hint: "16 · 2 = 32" },
+          { parts: [{ text: "Знаем $2^5 = 32$. Тогда $2^6 =$" }, { input: "32", width: "65px" }, { op: "· 2 =" }, { input: "64", width: "70px" }], hint: "32 · 2 = 64" },
+          { parts: [{ text: "Знаем $2^6 = 64$. Тогда $2^7 =$" }, { input: "64", width: "65px" }, { op: "· 2 =" }, { input: "128", width: "75px" }], hint: "64 · 2 = 128" }
+        ]
+      },
+      {
+        braceHeader: { leftExpr: "$2^6 =$", groupExpr: "$2 \\cdot 2 \\cdot 2 \\cdot 2 \\cdot 2$", underLabel: "$2^5 = 32$", rightExpr: "· 2" },
+        tasks: [
+          { parts: [{ text: "Знаем $2^3 = 8$. Тогда $2^4 =$" }, { input: "8", width: "65px" }, { op: "· 2 =" }, { input: "16", width: "70px" }], hint: "8 · 2 = 16" },
+          { parts: [{ text: "Знаем $2^5 = 32$. Тогда $2^6 =$" }, { input: "32", width: "65px" }, { op: "· 2 =" }, { input: "64", width: "70px" }], hint: "32 · 2 = 64" },
+          { parts: [{ text: "Знаем $2^7 = 128$. Тогда $2^8 =$" }, { input: "128", width: "65px" }, { op: "· 2 =" }, { input: "256", width: "75px" }], hint: "128 · 2 = 256" }
+        ]
+      },
+      {
+        braceHeader: { leftExpr: "$2^5 =$", groupExpr: "$2 \\cdot 2 \\cdot 2 \\cdot 2$", underLabel: "$2^4 = 16$", rightExpr: "· 2" },
+        tasks: [
+          { parts: [{ text: "Знаем $2^4 = 16$. Тогда $2^5 =$" }, { input: "16", width: "65px" }, { op: "· 2 =" }, { input: "32", width: "70px" }], hint: "16 · 2 = 32" },
+          { parts: [{ text: "Знаем $2^6 = 64$. Тогда $2^7 =$" }, { input: "64", width: "65px" }, { op: "· 2 =" }, { input: "128", width: "75px" }], hint: "64 · 2 = 128" },
+          { parts: [{ text: "Знаем $2^8 = 256$. Тогда $2^9 =$" }, { input: "256", width: "65px" }, { op: "· 2 =" }, { input: "512", width: "75px" }], hint: "256 · 2 = 512" }
+        ]
+      }
+    ]
+  },
+
+  // ЗАДАНИЕ 5
+  {
+    title: "Задание 5",
+    desc: "Семь двоек — это пять двоек ($2^5 = 32$) и ещё две двойки. Поэтому достаточно просто дважды умножить на 2:",
+    layout: "step-forward-brace",
+    variants: [
+      {
+        braceHeader: { leftExpr: "$2^7 =$", groupExpr: "$2 \\cdot 2 \\cdot 2 \\cdot 2 \\cdot 2$", underLabel: "$2^5 = 32$", rightExpr: "· 2 · 2" },
+        tasks: [
+          { parts: [{ text: "Знаем $2^5 = 32$. Тогда $2^7 =$" }, { input: "32", width: "65px" }, { op: "· 2 · 2 =" }, { input: "128", width: "75px" }], hint: "32 · 2 · 2 = 128" },
+          { parts: [{ text: "Знаем $2^6 = 64$. Тогда $2^8 =$" }, { input: "64", width: "65px" }, { op: "· 2 · 2 =" }, { input: "256", width: "75px" }], hint: "64 · 2 · 2 = 256" },
+          { parts: [{ text: "Знаем $2^8 = 256$. Тогда $2^{10} =$" }, { input: "256", width: "75px" }, { op: "· 2 · 2 =" }, { input: "1024", width: "85px" }], hint: "256 · 2 · 2 = 1024" }
+        ]
+      },
+      {
+        braceHeader: { leftExpr: "$2^6 =$", groupExpr: "$2 \\cdot 2 \\cdot 2 \\cdot 2$", underLabel: "$2^4 = 16$", rightExpr: "· 2 · 2" },
+        tasks: [
+          { parts: [{ text: "Знаем $2^4 = 16$. Тогда $2^6 =$" }, { input: "16", width: "65px" }, { op: "· 2 · 2 =" }, { input: "64", width: "75px" }], hint: "16 · 2 · 2 = 64" },
+          { parts: [{ text: "Знаем $2^5 = 32$. Тогда $2^7 =$" }, { input: "32", width: "65px" }, { op: "· 2 · 2 =" }, { input: "128", width: "75px" }], hint: "32 · 2 · 2 = 128" },
+          { parts: [{ text: "Знаем $2^7 = 128$. Тогда $2^9 =$" }, { input: "128", width: "75px" }, { op: "· 2 · 2 =" }, { input: "512", width: "85px" }], hint: "128 · 2 · 2 = 512" }
+        ]
+      },
+      {
+        braceHeader: { leftExpr: "$2^7 =$", groupExpr: "$2 \\cdot 2 \\cdot 2 \\cdot 2 \\cdot 2$", underLabel: "$2^5 = 32$", rightExpr: "· 2 · 2" },
+        tasks: [
+          { parts: [{ text: "Знаем $2^3 = 8$. Тогда $2^5 =$" }, { input: "8", width: "65px" }, { op: "· 2 · 2 =" }, { input: "32", width: "75px" }], hint: "8 · 2 · 2 = 32" },
+          { parts: [{ text: "Знаем $2^6 = 64$. Тогда $2^8 =$" }, { input: "64", width: "65px" }, { op: "· 2 · 2 =" }, { input: "256", width: "75px" }], hint: "64 · 2 · 2 = 256" },
+          { parts: [{ text: "Знаем $2^8 = 256$. Тогда $2^{10} =$" }, { input: "256", width: "75px" }, { op: "· 2 · 2 =" }, { input: "1024", width: "85px" }], hint: "256 · 2 · 2 = 1024" }
+        ]
+      }
+    ]
+  },
+
+  // ЗАДАНИЕ 6
+  {
+    title: "Задание 6",
+    desc: "В числе $2^{10} = 1024$ перемножаются десять двоек: это девять двоек ($2^9$) и ещё одна двойка. Чтобы убрать лишнюю двойку и получить $2^9$, достаточно разделить на 2 (или дважды разделить на 2, если отступаем на две степени):",
+    layout: "step-backward-brace",
+    variants: [
+      {
+        braceHeader: { leftExpr: "$2^{10} =$", groupExpr: "$2 \\cdot 2 \\cdot \\ldots \\cdot 2$", underLabel: "$2^9$ (9 двоек)", rightExpr: "· 2 = 1024" },
+        tasks: [
+          { parts: [{ text: "Знаем $2^{10} = 1024$. Тогда $2^9 =$" }, { input: "1024", width: "80px" }, { op: ": 2 =" }, { input: "512", width: "75px" }], hint: "1024 : 2 = 512" },
+          { parts: [{ text: "Знаем $2^8 = 256$. Тогда $2^7 =$" }, { input: "256", width: "75px" }, { op: ": 2 =" }, { input: "128", width: "75px" }], hint: "256 : 2 = 128" },
+          { parts: [{ text: "Знаем $2^{10} = 1024$. Тогда $2^8 =$" }, { input: "1024", width: "80px" }, { op: ": 2 : 2 =" }, { input: "256", width: "75px" }], hint: "1024 : 2 : 2 = 256" }
+        ]
+      },
+      {
+        braceHeader: { leftExpr: "$2^9 =$", groupExpr: "$2 \\cdot 2 \\cdot \\ldots \\cdot 2$", underLabel: "$2^8$ (8 двоек)", rightExpr: "· 2 = 512" },
+        tasks: [
+          { parts: [{ text: "Знаем $2^9 = 512$. Тогда $2^8 =$" }, { input: "512", width: "80px" }, { op: ": 2 =" }, { input: "256", width: "75px" }], hint: "512 : 2 = 256" },
+          { parts: [{ text: "Знаем $2^7 = 128$. Тогда $2^6 =$" }, { input: "128", width: "75px" }, { op: ": 2 =" }, { input: "64", width: "75px" }], hint: "128 : 2 = 64" },
+          { parts: [{ text: "Знаем $2^8 = 256$. Тогда $2^6 =$" }, { input: "256", width: "80px" }, { op: ": 2 : 2 =" }, { input: "64", width: "75px" }], hint: "256 : 2 : 2 = 64" }
+        ]
+      },
+      {
+        braceHeader: { leftExpr: "$2^{10} =$", groupExpr: "$2 \\cdot 2 \\cdot \\ldots \\cdot 2$", underLabel: "$2^9$ (9 двоек)", rightExpr: "· 2 = 1024" },
+        tasks: [
+          { parts: [{ text: "Знаем $2^{10} = 1024$. Тогда $2^9 =$" }, { input: "1024", width: "80px" }, { op: ": 2 =" }, { input: "512", width: "75px" }], hint: "1024 : 2 = 512" },
+          { parts: [{ text: "Знаем $2^6 = 64$. Тогда $2^5 =$" }, { input: "64", width: "75px" }, { op: ": 2 =" }, { input: "32", width: "75px" }], hint: "64 : 2 = 32" },
+          { parts: [{ text: "Знаем $2^9 = 512$. Тогда $2^7 =$" }, { input: "512", width: "80px" }, { op: ": 2 : 2 =" }, { input: "128", width: "75px" }], hint: "512 : 2 : 2 = 128" }
+        ]
+      }
+    ]
+  },
+
+  // ЗАДАНИЕ 7
+  {
+    title: "Задание 7",
+    desc: "Заполни все степени двойки по порядку сверху вниз по столбцам:",
+    layout: "columns-grid",
+    variants: [
+      [
+        { parts: [{ text: "$2^1 =$" }, { input: "2", width: "85px" }], hint: "2" },
+        { parts: [{ text: "$2^2 =$" }, { input: "4", width: "85px" }], hint: "4" },
+        { parts: [{ text: "$2^3 =$" }, { input: "8", width: "85px" }], hint: "8" },
+        { parts: [{ text: "$2^4 =$" }, { input: "16", width: "85px" }], hint: "16" },
+        { parts: [{ text: "$2^5 =$" }, { input: "32", width: "85px" }], hint: "32" },
+        { parts: [{ text: "$2^6 =$" }, { input: "64", width: "85px" }], hint: "64" },
+        { parts: [{ text: "$2^7 =$" }, { input: "128", width: "85px" }], hint: "128" },
+        { parts: [{ text: "$2^8 =$" }, { input: "256", width: "85px" }], hint: "256" },
+        { parts: [{ text: "$2^9 =$" }, { input: "512", width: "85px" }], hint: "512" },
+        { parts: [{ text: "$2^{10} =$" }, { input: "1024", width: "85px" }], hint: "1024" },
+        { parts: [{ text: "$2^{11} =$" }, { input: "2048", width: "85px" }], hint: "2048" },
+        { parts: [{ text: "$2^{12} =$" }, { input: "4096", width: "85px" }], hint: "4096" }
+      ]
+    ]
+  },
+
+  // ЗАДАНИЕ 8
+  {
+    title: "Задание 8",
+    desc: "Вспомни и впиши значения степеней в случайном порядке:",
+    layout: "grid",
+    variants: [
+      [
+        { parts: [{ text: "$2^7 =$" }, { input: "128", width: "85px" }], hint: "128" },
+        { parts: [{ text: "$2^{10} =$" }, { input: "1024", width: "85px" }], hint: "1024" },
+        { parts: [{ text: "$2^5 =$" }, { input: "32", width: "85px" }], hint: "32" },
+        { parts: [{ text: "$2^9 =$" }, { input: "512", width: "85px" }], hint: "512" },
+        { parts: [{ text: "$2^6 =$" }, { input: "64", width: "85px" }], hint: "64" },
+        { parts: [{ text: "$2^{12} =$" }, { input: "4096", width: "85px" }], hint: "4096" },
+        { parts: [{ text: "$2^8 =$" }, { input: "256", width: "85px" }], hint: "256" },
+        { parts: [{ text: "$2^4 =$" }, { input: "16", width: "85px" }], hint: "16" },
+        { parts: [{ text: "$2^{11} =$" }, { input: "2048", width: "85px" }], hint: "2048" }
+      ],
+      [
+        { parts: [{ text: "$2^6 =$" }, { input: "64", width: "85px" }], hint: "64" },
+        { parts: [{ text: "$2^8 =$" }, { input: "256", width: "85px" }], hint: "256" },
+        { parts: [{ text: "$2^{11} =$" }, { input: "2048", width: "85px" }], hint: "2048" },
+        { parts: [{ text: "$2^5 =$" }, { input: "32", width: "85px" }], hint: "32" },
+        { parts: [{ text: "$2^7 =$" }, { input: "128", width: "85px" }], hint: "128" },
+        { parts: [{ text: "$2^{10} =$" }, { input: "1024", width: "85px" }], hint: "1024" },
+        { parts: [{ text: "$2^9 =$" }, { input: "512", width: "85px" }], hint: "512" },
+        { parts: [{ text: "$2^{12} =$" }, { input: "4096", width: "85px" }], hint: "4096" },
+        { parts: [{ text: "$2^4 =$" }, { input: "16", width: "85px" }], hint: "16" }
+      ],
+      [
+        { parts: [{ text: "$2^9 =$" }, { input: "512", width: "85px" }], hint: "512" },
+        { parts: [{ text: "$2^5 =$" }, { input: "32", width: "85px" }], hint: "32" },
+        { parts: [{ text: "$2^{12} =$" }, { input: "4096", width: "85px" }], hint: "4096" },
+        { parts: [{ text: "$2^7 =$" }, { input: "128", width: "85px" }], hint: "128" },
+        { parts: [{ text: "$2^4 =$" }, { input: "16", width: "85px" }], hint: "16" },
+        { parts: [{ text: "$2^8 =$" }, { input: "256", width: "85px" }], hint: "256" },
+        { parts: [{ text: "$2^{10} =$" }, { input: "1024", width: "85px" }], hint: "1024" },
+        { parts: [{ text: "$2^6 =$" }, { input: "64", width: "85px" }], hint: "64" },
+        { parts: [{ text: "$2^{11} =$" }, { input: "2048", width: "85px" }], hint: "2048" }
+      ]
+    ]
+  },
+
+  // ЗАДАНИЕ 9
+  {
+    title: "Задание 9",
+    desc: "Запиши соотношения единиц измерения информации через степень двойки и в виде обычного числа:",
+    layout: "list",
+    variants: [
+      [
+        { parts: [{ text: "$1\\text{ Байт} = 2^x \\text{ Бит}, \\text{ где } x =$" }, { input: "3", width: "60px" }, { text: "$\\implies 1\\text{ Байт} =$" }, { input: "8", width: "70px" }, { text: "$\\text{Бит}$" }], hint: "x = 3; 8 Бит" },
+        { parts: [{ text: "$1\\text{ КБ} = 2^x \\text{ Байт}, \\text{ где } x =$" }, { input: "10", width: "60px" }, { text: "$\\implies 1\\text{ КБ} =$" }, { input: "1024", width: "85px" }, { text: "$\\text{Байт}$" }], hint: "x = 10; 1024 Байт" },
+        { parts: [{ text: "$512\\text{ Байт} = 2^x \\text{ Байт}, \\text{ где } x =$" }, { input: "9", width: "60px" }], hint: "9" },
+        { parts: [{ text: "$2048\\text{ Байт} = 2^x \\text{ Байт}, \\text{ где } x =$" }, { input: "11", width: "60px" }], hint: "11" }
+      ],
+      [
+        { parts: [{ text: "$1\\text{ Байт} = 2^x \\text{ Бит}, \\text{ где } x =$" }, { input: "3", width: "60px" }, { text: "$\\implies 1\\text{ Байт} =$" }, { input: "8", width: "70px" }, { text: "$\\text{Бит}$" }], hint: "x = 3; 8 Бит" },
+        { parts: [{ text: "$1\\text{ КБ} = 2^x \\text{ Байт}, \\text{ где } x =$" }, { input: "10", width: "60px" }, { text: "$\\implies 1\\text{ КБ} =$" }, { input: "1024", width: "85px" }, { text: "$\\text{Байт}$" }], hint: "x = 10; 1024 Байт" },
+        { parts: [{ text: "$256\\text{ Байт} = 2^x \\text{ Байт}, \\text{ где } x =$" }, { input: "8", width: "60px" }], hint: "8" },
+        { parts: [{ text: "$4096\\text{ Байт} = 2^x \\text{ Байт}, \\text{ где } x =$" }, { input: "12", width: "60px" }], hint: "12" }
+      ],
+      [
+        { parts: [{ text: "$1\\text{ Байт} = 2^x \\text{ Бит}, \\text{ где } x =$" }, { input: "3", width: "60px" }, { text: "$\\implies 1\\text{ Байт} =$" }, { input: "8", width: "70px" }, { text: "$\\text{Бит}$" }], hint: "x = 3; 8 Бит" },
+        { parts: [{ text: "$1\\text{ КБ} = 2^x \\text{ Байт}, \\text{ где } x =$" }, { input: "10", width: "60px" }, { text: "$\\implies 1\\text{ КБ} =$" }, { input: "1024", width: "85px" }, { text: "$\\text{Байт}$" }], hint: "x = 10; 1024 Байт" },
+        { parts: [{ text: "$128\\text{ Байт} = 2^x \\text{ Байт}, \\text{ где } x =$" }, { input: "7", width: "60px" }], hint: "7" },
+        { parts: [{ text: "$2048\\text{ Байт} = 2^x \\text{ Байт}, \\text{ где } x =$" }, { input: "11", width: "60px" }], hint: "11" }
+      ]
+    ]
+  }
+];
+
+let stages = [];
+let currentStep = 0;
+let taskStates = [];
+
+function buildTrainer() {
+  stages = stageBanks.map(stageBank => {
+    const selectedVariant = pickRandom(stageBank.variants);
+    if (stageBank.layout === 'brace-list') {
+      return {
+        title: stageBank.title,
+        desc: stageBank.desc,
+        layout: stageBank.layout,
+        braceTasks: JSON.parse(JSON.stringify(selectedVariant))
+      };
+    } else if (stageBank.layout === 'step-forward-brace' || stageBank.layout === 'step-backward-brace') {
+      return {
+        title: stageBank.title,
+        desc: stageBank.desc,
+        layout: stageBank.layout,
+        braceHeader: JSON.parse(JSON.stringify(selectedVariant.braceHeader)),
+        tasks: JSON.parse(JSON.stringify(selectedVariant.tasks))
+      };
+    } else {
+      return {
+        title: stageBank.title,
+        desc: stageBank.desc,
+        layout: stageBank.layout,
+        tasks: JSON.parse(JSON.stringify(selectedVariant))
+      };
+    }
+  });
+
+  taskStates = stages.map(() => ({ errors: 0, completed: false, score: 0 }));
+}
+
+function calculateTotalScore() {
+  return taskStates.reduce((acc, curr) => acc + curr.score, 0);
+}
+
+function updateScoreHeader() {
+  const total = calculateTotalScore();
+  const displayScore = Number.isInteger(total) ? total : total.toFixed(1);
+  document.getElementById('score-counter').innerText = `Баллы: ${displayScore} / ${stages.length}`;
+}
+
+function renderMath(element) {
+  if (window.renderMathInElement) {
+    renderMathInElement(element, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ]
+    });
+  }
+}
+
+function startTrainer() {
+  buildTrainer();
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  currentStep = 0;
+  updateScoreHeader();
+  renderStep();
+}
+
+function renderParts(parts) {
+  let html = '';
+  parts.forEach(p => {
+    if (p.text !== undefined) {
+      html += `<span>${p.text}</span>`;
+    } else if (p.op !== undefined) {
+      html += `<span class="math-op">${p.op}</span>`;
+    } else if (p.input !== undefined) {
+      const w = p.width || '65px';
+      html += `<input type="text" class="num-input step-input" style="width: ${w};" data-ans="${p.input}" placeholder="?">`;
+    }
+  });
+  return html;
+}
+
+function renderStep() {
+  const stage = stages[currentStep];
+  document.getElementById('step-counter').innerText = `Задание ${currentStep + 1} из ${stages.length}`;
+  updateScoreHeader();
+  document.getElementById('progress').style.width = `${(currentStep / stages.length) * 100}%`;
+
+  document.getElementById('step-title').innerHTML = stage.title;
+  document.getElementById('step-desc').innerHTML = stage.desc;
+
+  const container = document.getElementById('tasks-container');
+  container.innerHTML = '';
+
+  document.getElementById('btn-check').style.display = 'inline-block';
+  document.getElementById('btn-next').style.display = 'none';
+
+  if (stage.layout === 'step-forward-brace' || stage.layout === 'step-backward-brace') {
+    const bh = stage.braceHeader;
+    const demoBox = document.createElement('div');
+    demoBox.className = 'brace-box';
+    demoBox.style.marginBottom = '16px';
+    demoBox.innerHTML = `
+      <div class="brace-equation">
+        <div class="brace-eq-left">${bh.leftExpr}</div>
+        <div class="brace-group">
+          <div class="brace-top">${bh.groupExpr}</div>
+          ${braceSvg}
+          <div style="font-weight: 700; color: #2563eb; font-size: 15px;">${bh.underLabel}</div>
+        </div>
+        <div class="brace-dot">${bh.rightExpr}</div>
+      </div>
+    `;
+    container.appendChild(demoBox);
+  }
+
+  if (stage.layout === 'brace-list') {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'brace-wrapper';
+
+    stage.braceTasks.forEach((bTask, idx) => {
+      const box = document.createElement('div');
+      box.className = 'brace-box task-unit';
+      box.innerHTML = `
+        <div class="brace-equation">
+          <div class="brace-eq-left">${bTask.leftExpr}</div>
+          <div class="brace-group">
+            <div class="brace-top">${bTask.group1Expr}</div>
+            ${braceSvg}
+            <input type="text" class="num-input step-input" style="width: 65px;" data-ans="${bTask.group1Ans}" placeholder="?">
+          </div>
+          <div class="brace-dot">·</div>
+          <div class="brace-group">
+            <div class="brace-top">${bTask.group2Expr}</div>
+            ${braceSvg}
+            <input type="text" class="num-input step-input" style="width: 65px;" data-ans="${bTask.group2Ans}" placeholder="?">
+          </div>
+        </div>
+        <div class="brace-result-row">
+          ${renderParts(bTask.finalParts)}
+          <span class="feedback-note" id="hint-${idx}"></span>
+        </div>
+      `;
+      wrapper.appendChild(box);
+    });
+    container.appendChild(wrapper);
+  } else {
+    const wrapper = document.createElement('div');
+    if (stage.layout === 'columns-grid') {
+      wrapper.className = 'powers-columns-grid';
+    } else if (stage.layout === 'grid') {
+      wrapper.className = 'powers-grid';
+    } else {
+      wrapper.className = 'tasks-list';
+    }
+
+    stage.tasks.forEach((task, idx) => {
+      const row = document.createElement('div');
+      row.className = 'task-row task-unit';
+      row.innerHTML = `
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          ${renderParts(task.parts)}
+        </div>
+        <span class="feedback-note" id="hint-${idx}"></span>
+      `;
+      wrapper.appendChild(row);
+    });
+    container.appendChild(wrapper);
+  }
+
+  renderMath(document.getElementById('quiz-screen'));
+}
+
+function checkCurrentStep() {
+  const stage = stages[currentStep];
+  let stageErrors = 0;
+
+  if (stage.layout === 'brace-list') {
+    const units = document.querySelectorAll('.task-unit');
+    units.forEach((unit, idx) => {
+      const bTask = stage.braceTasks[idx];
+      const inputs = unit.querySelectorAll('.step-input');
+      const note = document.getElementById(`hint-${idx}`);
+      let boxError = false;
+
+      inputs.forEach(el => {
+        const val = el.value.trim().replace(/\s+/g, '');
+        const correct = el.dataset.ans.replace(/\s+/g, '');
+        el.disabled = true;
+        if (val === correct) {
+          el.classList.add('correct');
+        } else {
+          el.classList.add('wrong');
+          boxError = true;
+        }
+      });
+
+      if (boxError) {
+        stageErrors++;
+        if (note) {
+          note.style.display = 'inline';
+          note.innerHTML = `(правильно: <strong>${bTask.hint}</strong>)`;
+        }
+      }
+    });
+  } else {
+    const units = document.querySelectorAll('.task-unit');
+    units.forEach((unit, idx) => {
+      const task = stage.tasks[idx];
+      const inputs = unit.querySelectorAll('.step-input');
+      const note = document.getElementById(`hint-${idx}`);
+      let rowError = false;
+
+      inputs.forEach(el => {
+        const val = el.value.trim().replace(/\s+/g, '');
+        const correct = el.dataset.ans.replace(/\s+/g, '');
+        el.disabled = true;
+        if (val === correct) {
+          el.classList.add('correct');
+        } else {
+          el.classList.add('wrong');
+          rowError = true;
+        }
+      });
+
+      if (rowError) {
+        stageErrors++;
+        if (note) {
+          note.style.display = 'inline';
+          note.innerHTML = `(${task.hint})`;
+        }
+      }
+    });
+  }
+
+  let assignedScore = 0;
+  if (stageErrors === 0) assignedScore = 1;
+  else if (stageErrors === 1) assignedScore = 0.5;
+  else assignedScore = 0;
+
+  taskStates[currentStep] = {
+    errors: stageErrors,
+    completed: true,
+    score: assignedScore
+  };
+
+  updateScoreHeader();
+
+  document.getElementById('btn-check').style.display = 'none';
+  document.getElementById('btn-next').style.display = 'inline-block';
+}
+
+function goToNextStep() {
+  currentStep++;
+  if (currentStep < stages.length) {
+    renderStep();
+  } else {
+    showResults();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  const res = document.getElementById('result-screen');
+  res.style.display = 'block';
+
+  const total = calculateTotalScore();
+  const displayScore = Number.isInteger(total) ? total : total.toFixed(1);
+  document.getElementById('final-score').innerText = `${displayScore} / ${stages.length}`;
+
+  let perfectCount = 0;
+  let partialCount = 0;
+  taskStates.forEach(st => {
+    if (st.errors === 0) perfectCount++;
+    else if (st.errors === 1 && st.score > 0) partialCount++;
+  });
+
+  const msg = document.getElementById('final-message');
+  if (perfectCount === stages.length) {
+    msg.innerHTML = `Идеально! Все <strong>${stages.length}</strong> заданий выполнены без единой ошибки с первой попытки!`;
+  } else {
+    msg.innerHTML = `Заданий без ошибок: <strong>${perfectCount}</strong>, с 1 ошибкой: <strong>${partialCount}</strong>. Общий итог: <strong>${displayScore}</strong> из <strong>${stages.length}</strong>.`;
+  }
+
+  const badgesContainer = document.getElementById('results-badges');
+  badgesContainer.innerHTML = '';
+
+  taskStates.forEach((st, idx) => {
+    const badge = document.createElement('div');
+    let statusClass = 'wrong';
+    if (st.errors === 0) statusClass = 'correct';
+    else if (st.score > 0) statusClass = 'partial';
+
+    badge.className = `badge-item ${statusClass}`;
+    badge.innerText = `№${idx + 1}`;
+    badge.title = `Задание №${idx + 1}: ${st.score} б. (${st.errors} ош.)`;
+    badgesContainer.appendChild(badge);
+  });
+}
+
+function restart() {
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('start-screen').style.display = 'block';
+}
+</script>
+</body>
+</html>
